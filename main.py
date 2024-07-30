@@ -35,11 +35,11 @@ if __name__ == "__main__":
     with open(args.text_file, 'r') as f:
         lines = f.readlines()
     
-    sorted_lines = replace_values(config, lines)
+    replaced_lines = replace_values(config, lines)
     
     with open(args.text_file, 'w') as f:
-        for line in sorted_lines:
+        for line in replaced_lines:
            f.write(line+"\n")
 
-    for line in sorted_lines:
+    for line in replaced_lines:
         print(line)
