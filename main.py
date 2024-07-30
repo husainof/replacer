@@ -14,9 +14,8 @@ def replace_values(config, lines):
         old_line = line
         for key, value in config.items():
             line = line.replace(key, value)
-        if line != old_line:
-            changes[i] = sum(1 for a, b in zip(old_line, line) if a != b)
-            lines[i] = line
+        changes[i] = sum(1 for a, b in zip(old_line, line) if a != b)
+        lines[i] = line
 
     sorted_changes = sorted(changes.items(), key=lambda x: x[1], reverse=True)
     sorted_lines = []
