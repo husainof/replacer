@@ -1,6 +1,7 @@
 import argparse
 
-def read_config(config_file):
+
+def read_config(config_file: str) -> dict[str, str]:
     replacements = {}
     with open(config_file, 'r') as f:
         for line in f:
@@ -8,20 +9,20 @@ def read_config(config_file):
             replacements[key] = value
     return replacements
 
-def replace_values(config, lines):
+def replace_value(config: dict[str, str], line: str) -> (str, int):
+    new_line = line
+    for key, value in config.items():
+        if key in line:
+            new_line = new_line.replace(key, value)
+    changes = sum(1 for a, b in zip(line, new_line) if a != b)
+    return new_line, changes
+
+def replace_values(rules: dict[str, str], lines: list[str]) -> list[str]:
     changes = {}
     for i, line in enumerate(lines):
-        old_line = line
-        for key, value in config.items():
-            line = line.replace(key, value)
-        changes[i] = sum(1 for a, b in zip(old_line, line) if a != b)
-        lines[i] = line
-
+        lines[i], changes[i] = replace_value(rules, line)
     sorted_changes = sorted(changes.items(), key=lambda x: x[1], reverse=True)
-    sorted_lines = []
-    for i, _ in sorted_changes:
-        sorted_lines.append(lines[i].strip())
-    return sorted_lines
+    return [lines[i] for i, _ in sorted_changes]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Replace values in a text file')
@@ -30,15 +31,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     config = read_config(args.config_file)
-    
+
     with open(args.text_file, 'r') as f:
-        lines = f.readlines()
-    
+        lines = list(map(lambda x: x.strip(), f.readlines()))
+
     replaced_lines = replace_values(config, lines)
-    
+
     with open(args.text_file, 'w') as f:
-        for line in replaced_lines:
-           f.write(line+"\n")
+        f.writelines(list(map(lambda x: x+"\n", replaced_lines)))
 
     for line in replaced_lines:
         print(line)
